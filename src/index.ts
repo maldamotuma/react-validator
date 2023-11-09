@@ -1,3 +1,3 @@
-import { useValidate as useValidator } from './components/useValidate'
+import { useValidate as useValidator, rulesAndMessagedType } from './components/useValidate'
 
-export { useValidator }
+export { useValidator, rulesAndMessagedType }
