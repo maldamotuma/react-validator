@@ -1,6 +1,5 @@
 node_modules
-.idea
-dist
-npm-error.log
 npm.lock
 .parcel-cache
+dist
+npm-error.log
