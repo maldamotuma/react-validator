@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
+    "@types/validator": "^13.11.6",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "eslint": "^8.53.0",
@@ -24,10 +25,11 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "parcel": "^2.10.2",
     "process": "^0.11.10",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "validator": "^13.11.0"
   },
   "dependencies": {
-    "@malda/react-validator": "^1.0.1",
+    "@malda/react-validator": "^1.0.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }
