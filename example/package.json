@@ -6,15 +6,12 @@
         "start": "parcel src/index.html"
     },
     "devDependencies": {
+        "@malda/react-validator": "^1.0.11",
         "@types/react": "^18.2.37",
         "@types/react-dom": "^18.2.15",
-        "my-react-typescript-package": "^1.0.0",
         "parcel": "^2.10.2",
         "process": "^0.11.10",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
-    },
-    "dependencies": {
-        "@malda/react-validator": "^1.0.1"
     }
 }

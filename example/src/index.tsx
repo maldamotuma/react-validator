@@ -1,28 +1,43 @@
 import React, { FormEvent } from 'react'
 import ReactDOM from 'react-dom/client'
-import { useValidator } from '@malda/react-validator'
+import { rulesAndMessagedType, useValidator } from '@malda/react-validator'
 // import { rulesAndMessagedType, useValidate as useValidator } from './useValidate'
+// import validator from 'validator'
 import './style.css'
 
-// const rules: rulesAndMessagedType = {
-//   rules: {
-//     required: ['required'],
-//     name: ['required', 'name'],
-//     email: ['required', 'email'],
-//     full_name: ['required', 'full_name'],
-//     portfolio_link: ['required', 'url'],
-//   },
-// }
+const rules: rulesAndMessagedType = {
+  rules: {
+    required: ['required'],
+    name: ['required', 'name'],
+    email: ['required', 'email'],
+    full_name: ['required', 'full_name'],
+    portfolio_link: ['required', 'url'],
+  },
+
+  // messages: {
+  //   name: ['Maqaa kee galchi horii'],
+  // },
+
+  // custom: {
+  //   rules: {
+  //     free: (in_val: string) => {
+  //       return validator.matches(in_val, /^0[79][0-9]{8}$/g)
+  //     },
+  //   },
+  //   messages: {
+  //     required: 'Enter Phone number dUDE',
+  //     free: 'It is free man',
+  //   },
+  // },
+}
 const TestValidate = () => {
-  const { validate } = useValidator()
-  // const { validate } = useValidator('malda-react-validator', rules)
+  const { validate } = useValidator('malda-react-validator', rules)
 
   const handle_submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // validate(() => {
-    //   alert('Valid and Submitting')
-    // })
-    validate()
+    validate(() => {
+      alert('Valid and Submitting')
+    })
   }
 
   return (

@@ -1,6 +1,6 @@
 {
   "name": "@malda/react-validator",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Validation hook for react next",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

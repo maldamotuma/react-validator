@@ -58,6 +58,7 @@ const validationRules = {
   time: (in_val: string) => validator.isTime(in_val),
   tax_id: (in_val: string) => validator.isTaxID(in_val),
   uuid: (in_val: string) => validator.isUUID(in_val),
+  eth_phone: (in_val: string) => validator.matches(in_val, /^0[79][0-9]{8}$/g),
 }
 
 const validationMessages = {
@@ -119,6 +120,7 @@ const validationMessages = {
   time: (in_name: string) => `${in_name}: check if the string is a valid time`,
   tax_id: (in_name: string) => `${in_name}: check if the string is a valid Tax Identification Number.`,
   uuid: (in_name: string) => `${in_name}: check if the string is a UUID`,
+  eth_phone: (in_name: string) => `${in_name}: Please Enter a valid Ethiotelecom phone or Safaricon Ethiopia Phone`,
 }
 
 export type validationTypes =
@@ -175,13 +177,14 @@ export type validationTypes =
   | 'time'
   | 'tax_id'
   | 'uuid'
+  | 'eth_phone'
 
 export type rulesAndMessagedType = {
   rules: { [key: string]: validationTypes[] }
   messages?: { [key: string]: string[] }
   custom?: {
-    rules: { [key: string]: string }
-    messages: { [key: string]: string }
+    rules: { [key: string]: (in_val: string) => boolean }
+    messages?: { [key: string]: string }
   }
 }
 
@@ -203,6 +206,7 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
       if (vl) {
         parent?.removeChild(vl)
       }
+      let no_predefined_rule = true
       for (i; i < rls_legth; i++) {
         if (!validationRules[rls[i]](inpt.value)) {
           const p = document.createElement('p')
@@ -212,11 +216,37 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
           p.style.fontSize = '14px'
           p.classList.add('react-next-validator-helper')
           p.setAttribute('id', `validation-${ipt_name}`)
-          const msg = document.createTextNode(`**${validationMessages[rls[i]](ipt_name)}`)
+          const msg = document.createTextNode(
+            `**${
+              (rules_objects.messages && rules_objects.messages[ipt_name] && rules_objects.messages[ipt_name][i]) ||
+              validationMessages[rls[i]](ipt_name)
+            }`,
+          )
           p.append(msg)
           parent?.append(p)
           if (valid.current) valid.current = false
+          if (no_predefined_rule) no_predefined_rule = false
           return
+        }
+      }
+      if (no_predefined_rule && rules_objects.custom?.rules[ipt_name]) {
+        if (!rules_objects.custom?.rules[ipt_name](inpt.value)) {
+          const p = document.createElement('p')
+          p.style.padding = '5px 10px 0px 10px'
+          p.style.margin = '0px'
+          p.style.color = 'red'
+          p.style.fontSize = '14px'
+          p.classList.add('react-next-validator-helper')
+          p.setAttribute('id', `validation-${ipt_name}`)
+          const msg = document.createTextNode(
+            `**${
+              (rules_objects.custom?.messages && rules_objects.custom?.messages[ipt_name]) ||
+              'Invalid Data Given (Please Provide a valid pattern input)'
+            }`,
+          )
+          p.append(msg)
+          parent?.append(p)
+          if (valid.current) valid.current = false
         }
       }
     },
@@ -251,8 +281,10 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
     valid.current = true
     const frm: HTMLFormElement | null = document.querySelector(`form#${form_id}`)
     if (frm) {
-      blurTrack.current = [...Object.keys(rules_objects.rules)]
-      Object.keys(rules_objects.rules).forEach((key) => {
+      blurTrack.current = []
+      const formdata = new FormData(frm)
+      formdata.forEach((_value, key) => {
+        blurTrack.current.push(key)
         check_validity(key, frm)
       })
     }
