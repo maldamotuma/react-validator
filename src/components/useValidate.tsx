@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useRef } from 'react'
 import validator from 'validator'
 
@@ -190,7 +192,6 @@ export type rulesAndMessagedType = {
 
 export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType) => {
   const valid = useRef<boolean>(false)
-  const mountRef = useRef<null | true>(null)
   const blurTrack = useRef<string[]>([])
 
   useCallback(() => {}, [])
@@ -254,10 +255,25 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
   )
 
   useEffect(() => {
-    if (mountRef.current) {
-      const frm: HTMLFormElement | null = document.querySelector(`form#${form_id}`)
+    const frm: HTMLFormElement | null = document.querySelector(`form#${form_id}`)
+    frm?.querySelectorAll(`input`)?.forEach((inpt) => {
+      inpt.addEventListener('blur', (e: any) => {
+        const input_name = e.target?.name
+        if (!blurTrack.current.includes(input_name)) {
+          blurTrack.current.push(input_name)
+          check_validity(e.target?.name, frm)
+        }
+      })
+    })
+    frm?.querySelectorAll(`input`)?.forEach((inpt) => {
+      inpt.addEventListener('input', (e: any) => {
+        const input_name = e.target?.name
+        if (blurTrack.current.includes(input_name)) check_validity(e.target?.name, frm)
+      })
+    })
+    return () => {
       frm?.querySelectorAll(`input`)?.forEach((inpt) => {
-        inpt.addEventListener('blur', (e: any) => {
+        inpt.removeEventListener('blur', (e: any) => {
           const input_name = e.target?.name
           if (!blurTrack.current.includes(input_name)) {
             blurTrack.current.push(input_name)
@@ -266,14 +282,11 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
         })
       })
       frm?.querySelectorAll(`input`)?.forEach((inpt) => {
-        inpt.addEventListener('input', (e: any) => {
+        inpt.removeEventListener('input', (e: any) => {
           const input_name = e.target?.name
           if (blurTrack.current.includes(input_name)) check_validity(e.target?.name, frm)
         })
       })
-    }
-    return () => {
-      mountRef.current = true
     }
   }, [check_validity, form_id])
 
