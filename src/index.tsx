@@ -43,7 +43,7 @@ const App = () => {
     return (
         <>
             <div className='wrapper'>
-                <h2>@malda/react-validator</h2>
+                <h2>@malda/react-validator check</h2>
                 <form id='malda-react-validator' onSubmit={handle_submit}>
                     <div className='input-box' id='input-free'>
                         <input type='text' name='free' placeholder='Enter your free data' />
