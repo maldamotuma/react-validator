@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { rulesAndMessagedType, useValidator } from '@malda/react-validator'
 import validator from 'validator'
 import './style.css'
+// import { rulesAndMessagedType, useValidate } from './useValidate'
 
 const rules: rulesAndMessagedType = {
   rules: {
@@ -11,6 +12,9 @@ const rules: rulesAndMessagedType = {
     email: ['required', 'email'],
     full_name: ['required', 'full_name'],
     portfolio_link: ['required', 'url'],
+    description: ['required'],
+    options: ['required'],
+    options2: ['required'],
   },
 
   messages: {
@@ -61,6 +65,12 @@ const TestValidate = () => {
           </div>
           <div className='input-box' id='input-portfolio_link'>
             <input type='text' placeholder='portfolio link' name='portfolio_link' />
+          </div>
+          <div className='input-box' id='input-description'>
+            <textarea placeholder='portfolio link' name='description' rows={3} />
+          </div>
+          <div className='input-box' id='input-options2'>
+            <input type='file' name='options2' />
           </div>
           <div className='input-box button'>
             <input type='Submit' value='validate' />

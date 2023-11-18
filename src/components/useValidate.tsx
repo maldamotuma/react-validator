@@ -198,8 +198,8 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
 
   const check_validity = useCallback(
     (ipt_name: string, frm: HTMLFormElement) => {
-      const parent = document.querySelector(`#input-${ipt_name}`)
-      const inpt: any = frm?.querySelector(`input[name='${ipt_name}']`)
+      const parent = frm.querySelector(`#input-${ipt_name}`)
+      const inpt: any = frm?.querySelector(`[name='${ipt_name}']`)
       const rls = rules_objects.rules[ipt_name]
       const rls_legth = rls?.length || 0
       let i: number = 0
@@ -256,7 +256,7 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
 
   useEffect(() => {
     const frm: HTMLFormElement | null = document.querySelector(`form#${form_id}`)
-    frm?.querySelectorAll(`input`)?.forEach((inpt) => {
+    frm?.querySelectorAll(`[name]`)?.forEach((inpt) => {
       inpt.addEventListener('blur', (e: any) => {
         const input_name = e.target?.name
         if (!blurTrack.current.includes(input_name)) {
@@ -265,14 +265,14 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
         }
       })
     })
-    frm?.querySelectorAll(`input`)?.forEach((inpt) => {
+    frm?.querySelectorAll(`[name]`)?.forEach((inpt) => {
       inpt.addEventListener('input', (e: any) => {
         const input_name = e.target?.name
         if (blurTrack.current.includes(input_name)) check_validity(e.target?.name, frm)
       })
     })
     return () => {
-      frm?.querySelectorAll(`input`)?.forEach((inpt) => {
+      frm?.querySelectorAll(`[name]`)?.forEach((inpt) => {
         inpt.removeEventListener('blur', (e: any) => {
           const input_name = e.target?.name
           if (!blurTrack.current.includes(input_name)) {
@@ -281,7 +281,7 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
           }
         })
       })
-      frm?.querySelectorAll(`input`)?.forEach((inpt) => {
+      frm?.querySelectorAll(`[name]`)?.forEach((inpt) => {
         inpt.removeEventListener('input', (e: any) => {
           const input_name = e.target?.name
           if (blurTrack.current.includes(input_name)) check_validity(e.target?.name, frm)
