@@ -13,8 +13,6 @@ const rules: rulesAndMessagedType = {
     full_name: ['required', 'full_name'],
     portfolio_link: ['required', 'url'],
     description: ['required'],
-    options: ['required'],
-    options2: ['required'],
   },
 
   messages: {
@@ -32,6 +30,23 @@ const rules: rulesAndMessagedType = {
       free: 'It is free man',
     },
   },
+
+  // files: {
+  //   rules: {
+  //     image: {
+  //       required: true,
+  //       max: 3,
+  //       maxSize: 2048,
+  //       type: ["image/png", "application/zip"]
+  //     }
+  //   },
+  //   messages: {
+  //     image: {
+  //       max: "waan baay'ee galchiteem",
+  //       maxSize: "Megabaaytii xiqqoo galchi",
+  //     }
+  //   }
+  // }
 }
 const TestValidate = () => {
   const { validate } = useValidator('malda-react-validator', rules)
@@ -69,8 +84,8 @@ const TestValidate = () => {
           <div className='input-box' id='input-description'>
             <textarea placeholder='portfolio link' name='description' rows={3} />
           </div>
-          <div className='input-box' id='input-options2'>
-            <input type='file' name='options2' />
+          <div className='input-box' id='input-image'>
+            <input type='file' name='image' multiple />
           </div>
           <div className='input-box button'>
             <input type='Submit' value='validate' />

@@ -181,12 +181,77 @@ export type validationTypes =
   | 'uuid'
   | 'eth_phone'
 
+const fileValidator: any = {
+  max(fl: FileList, max: number) {
+    return fl.length <= max
+  },
+  required(fl: FileList, rqrd: boolean) {
+    return rqrd ? fl.length > 0 : true
+  },
+  min(fl: FileList, min: number) {
+    return fl[0].size >= min
+  },
+  maxSize(fl: FileList, max: number) {
+    let fileSize = 0;
+    const cnt = fl.length;
+    for (let i = 0; i < cnt; i++) {
+      fileSize += (fl[i].size / 1024);
+    }
+    return fileSize <= max
+  },
+  minSize(fl: FileList, min: number) {
+    let fileSize = 0;
+    const cnt = fl.length;
+    for (let i = 0; i < cnt; i++) {
+      fileSize += (fl[i].size / 1024);
+    }
+    return fileSize >= min
+  },
+  type(fl: FileList, typ: string | string[]) {
+    const cnt = fl.length;
+    for (let i = 0; i < cnt; i++) {
+      if (typeof (typ) === "string" ? fl[i].type !== typ : !typ.includes(fl[i].type)) return false
+    }
+    return true
+  },
+};
+
+const fileValidatorFeedbacks: any = {
+  max(infl: number) { return `Max files are ${infl}` },
+  required(infl: boolean) { return infl ? `File Required` : "" },
+  min(infl: number) { return `Atleast ${infl} files required` },
+  maxSize(infl: number) { return `The File Should not Exceed ${infl / 1024}MB` },
+  minSize(infl: number) { return `The File Should atleast ${infl / 1024}MB` },
+  type(infl: string) { return `File Must be type of ${infl}` },
+}
+
+export type FileValidatorRules = {
+  max?: number,
+  required?: boolean;
+  min?: number;
+  maxSize?: number;
+  minSize?: number;
+  type?: string | string[];
+}
+
+type FileValidatorRuleKeys = "type" | "max" | "required" | "min" | "maxSize" | "minSize"
+
 export type rulesAndMessagedType = {
   rules: { [key: string]: validationTypes[] }
-  messages?: { [key: string]: string[] }
+  messages?: {
+    [key: string]: string[]
+  };
   custom?: {
     rules: { [key: string]: (in_val: string) => boolean }
     messages?: { [key: string]: string }
+  };
+  files?: {
+    rules: { [key: string]: FileValidatorRules };
+    messages?: {
+      [key: string]: {
+        [Key in FileValidatorRuleKeys]?: string
+      }
+    }
   }
 }
 
@@ -194,7 +259,7 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
   const valid = useRef<boolean>(false)
   const blurTrack = useRef<string[]>([])
 
-  useCallback(() => {}, [])
+  useCallback(() => { }, [])
 
   const check_validity = useCallback(
     (ipt_name: string, frm: HTMLFormElement) => {
@@ -218,9 +283,8 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
           p.classList.add('react-next-validator-helper')
           p.setAttribute('id', `validation-${ipt_name}`)
           const msg = document.createTextNode(
-            `**${
-              (rules_objects.messages && rules_objects.messages[ipt_name] && rules_objects.messages[ipt_name][i]) ||
-              validationMessages[rls[i]](ipt_name)
+            `**${(rules_objects.messages && rules_objects.messages[ipt_name] && rules_objects.messages[ipt_name][i]) ||
+            validationMessages[rls[i]](ipt_name)
             }`,
           )
           p.append(msg)
@@ -240,9 +304,8 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
           p.classList.add('react-next-validator-helper')
           p.setAttribute('id', `validation-${ipt_name}`)
           const msg = document.createTextNode(
-            `**${
-              (rules_objects.custom?.messages && rules_objects.custom?.messages[ipt_name]) ||
-              'Invalid Data Given (Please Provide a valid pattern input)'
+            `**${(rules_objects.custom?.messages && rules_objects.custom?.messages[ipt_name]) ||
+            'Invalid Data Given (Please Provide a valid pattern input)'
             }`,
           )
           p.append(msg)
@@ -254,12 +317,47 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
     [rules_objects],
   )
 
+  const validate_files = useCallback(
+    (ipt_name: string, frm: HTMLFormElement) => {
+      const parent = frm.querySelector(`#input-${ipt_name}`)
+      const inpt: any = frm?.querySelector(`[name='${ipt_name}'][type="file"]`)
+      const rls = rules_objects.files?.rules ? rules_objects.files?.rules[ipt_name] : {};
+      const rulesStringArray = rls ? Object.keys(rls) as FileValidatorRuleKeys[]: [];
+      const rls_legth = rulesStringArray.length;
+      let i: number = 0
+      const vl = parent?.querySelector(`#validation-${ipt_name}`)
+      if (vl) {
+        parent?.removeChild(vl)
+      }
+      for (i; i < rls_legth; i++) {
+        const res = fileValidator[rulesStringArray[i]](inpt?.files || [], rls[rulesStringArray[i]]);
+        if (!res) {
+          const p = document.createElement('p')
+          p.style.padding = '5px 10px 0px 10px'
+          p.style.margin = '0px'
+          p.style.color = 'red'
+          p.style.fontSize = '14px'
+          p.classList.add('react-next-validator-helper')
+          p.setAttribute('id', `validation-${ipt_name}`)
+          const msg = document.createTextNode(
+            `**${(rules_objects.files?.messages && rules_objects.files.messages[ipt_name] && rules_objects.files.messages[ipt_name][rulesStringArray[i]]) || fileValidatorFeedbacks[rulesStringArray[i]](rls[rulesStringArray[i]])}`,
+          )
+          p.append(msg)
+          parent?.append(p)
+          if (valid.current) valid.current = false
+          return
+        }
+      }
+    },
+    [rules_objects],
+  )
+
   useEffect(() => {
     const frm: HTMLFormElement | null = document.querySelector(`form#${form_id}`)
     frm?.querySelectorAll(`[name]`)?.forEach((inpt) => {
       inpt.addEventListener('blur', (e: any) => {
         const input_name = e.target?.name
-        if (!blurTrack.current.includes(input_name)) {
+        if (!blurTrack.current.includes(input_name) && inpt?.getAttribute("type") !== "file") {
           blurTrack.current.push(input_name)
           check_validity(e.target?.name, frm)
         }
@@ -268,7 +366,14 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
     frm?.querySelectorAll(`[name]`)?.forEach((inpt) => {
       inpt.addEventListener('input', (e: any) => {
         const input_name = e.target?.name
-        if (blurTrack.current.includes(input_name)) check_validity(e.target?.name, frm)
+        if (inpt?.getAttribute("type") === "file") blurTrack.current.push(input_name)
+        if (blurTrack.current.includes(input_name)) {
+          if (inpt?.getAttribute("type") === "file") {
+            validate_files(input_name, frm);
+          } else {
+            check_validity(input_name, frm)
+          }
+        }
       })
     })
     return () => {
@@ -295,10 +400,13 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
     const frm: HTMLFormElement | null = document.querySelector(`form#${form_id}`)
     if (frm) {
       blurTrack.current = []
-      const formdata = new FormData(frm)
-      formdata.forEach((_value, key) => {
-        blurTrack.current.push(key)
-        check_validity(key, frm)
+      Object.keys(rules_objects.rules).forEach(rl => {
+        blurTrack.current.push(rl)
+        check_validity(rl, frm)
+      })
+      Object.keys(rules_objects.files || {}).forEach(rl => {
+        blurTrack.current.push(rl)
+        validate_files(rl, frm)
       })
     }
     if (valid.current) {
