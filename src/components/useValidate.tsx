@@ -404,7 +404,7 @@ export const useValidate = (form_id: string, rules_objects: rulesAndMessagedType
         blurTrack.current.push(rl)
         check_validity(rl, frm)
       })
-      Object.keys(rules_objects.files || {}).forEach(rl => {
+      Object.keys(rules_objects.files?.rules || {}).forEach(rl => {
         blurTrack.current.push(rl)
         validate_files(rl, frm)
       })
