@@ -31,22 +31,22 @@ const rules: rulesAndMessagedType = {
     },
   },
 
-  // files: {
-  //   rules: {
-  //     image: {
-  //       required: true,
-  //       max: 3,
-  //       maxSize: 2048,
-  //       type: ["image/png", "application/zip"]
-  //     }
-  //   },
-  //   messages: {
-  //     image: {
-  //       max: "waan baay'ee galchiteem",
-  //       maxSize: "Megabaaytii xiqqoo galchi",
-  //     }
-  //   }
-  // }
+  files: {
+    rules: {
+      image: {
+        required: true,
+        type: ["image/png", "application/zip"],
+        max: 3,
+        maxSize: 2048
+      }
+    },
+    messages: {
+      image: {
+        max: "waan baay'ee galchiteem",
+        maxSize: "Megabaaytii xiqqoo galchi",
+      }
+    }
+  }
 }
 const TestValidate = () => {
   const { validate } = useValidator('malda-react-validator', rules)
